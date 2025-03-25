@@ -1,0 +1,27 @@
+package main
+
+import "fmt"
+
+
+func sendValues(ch chan int) {
+	for i := 1; i <= 5; i++ {
+		ch <- i
+	}
+	close(ch)
+}
+
+func main() {
+
+	ch := make(chan int)
+
+
+	go sendValues(ch)
+
+
+	fmt.Println("Values received from the channel:")
+	for val := range ch {
+		fmt.Println(val)
+	}
+
+	fmt.Println("Channel closed, loop ended.")
+}

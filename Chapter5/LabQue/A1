@@ -1,0 +1,67 @@
+package main
+
+import (
+	"fmt"
+//strconv
+	"sync"
+)
+
+func sumOfSquares(digits []int, ch chan int) {
+	sum := 0
+	for _, digit := range digits {
+		sum += digit * digit
+	}
+	ch <- sum 
+}
+
+
+func sumOfCubes(digits []int, ch chan int) {
+	sum := 0
+	for _, digit := range digits {
+		sum += digit * digit * digit
+	}
+	ch <- Sum
+}
+
+func main() {
+
+	number := 123
+	numStr := strconv.Itoa(number)
+
+	var digits []int
+	for _, ch := range numStr {
+		digit, _ := strconv.Atoi(string(ch))
+		digits = append(digits, digit)
+	}
+
+	
+	var wg sync.WaitGroup
+	ch := make(chan int, 2) 
+	
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		sumOfSquares(digits, ch)
+	}()
+	go func() {
+		defer wg.Done()
+		sumOfCubes(digits, ch)
+	}()
+
+	wg.Wait()
+
+	close(ch)
+
+
+	squaresSum := <-ch
+	cubesSum := <-ch
+
+
+	finalSum := squaresSum + cubesSum
+
+
+	fmt.Printf("Sum of squares = %d\n", squaresSum)
+	fmt.Printf("Sum of cubes = %d\n", cubesSum)
+	fmt.Printf("Final sum of squares and cubes = %d\n", finalSum)
+}

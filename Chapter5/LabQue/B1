@@ -1,0 +1,25 @@
+package main
+
+import "fmt"
+
+func main() {
+	
+	ch := make(chan int, 5)
+
+	ch <- 10
+	ch <- 20
+	ch <- 30
+	ch <- 40
+	ch <- 50
+
+	fmt.Printf("Capacity of channel: %d\n", cap(ch))
+	fmt.Printf("Length of channel before reading: %d\n", len(ch))
+
+	fmt.Println("Reading values from channel:")
+	for i := 0; i < 5; i++ {
+		val := <-ch
+		fmt.Println(val)
+	}
+
+	fmt.Printf("Length of channel after reading: %d\n", len(ch))
+}

@@ -1,0 +1,55 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+
+func checkEven(chEven chan int, num int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if num%2 == 0 {
+		chEven <- num
+	}
+}
+
+
+func checkOdd(chOdd chan int, num int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if num%2 != 0 {
+		chOdd <- num
+	}
+}
+
+func main() {
+
+	numbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	chEven := make(chan int)
+	chOdd := make(chan int)
+
+	var wg sync.WaitGroup
+
+
+	for _, num := range numbers {
+		wg.Add(1)
+		if num%2 == 0 {
+			go checkEven(chEven, num, &wg)
+		} else {
+			go checkOdd(chOdd, num, &wg)
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(chEven)
+		close(chOdd)
+	}()
+	fmt.Println("Even numbers:")
+	for num := range chEven {
+		fmt.Println(num)
+	}
+	fmt.Println("Odd numbers:")
+	for num := range chOdd {
+		fmt.Println(num)
+	}
+}

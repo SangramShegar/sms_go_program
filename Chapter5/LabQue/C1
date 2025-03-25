@@ -1,0 +1,34 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+func worker(id int, wg *sync.WaitGroup, ch chan bool) {
+	
+	fmt.Printf("Worker %d is working...\n", id)
+	time.Sleep(time.Duration(id) * time.Second) 
+	fmt.Printf("Worker %d finished work.\n", id)
+
+	
+	ch <- true
+	wg.Done()
+}
+
+func main() {
+	
+	numWorkers := 3
+
+	var wg sync.WaitGroup
+	ch := make(chan bool, numWorkers)
+	for i := 1; i <= numWorkers; i++ {
+		wg.Add(1)
+		go worker(i, &wg, ch)
+	}
+
+	
+	wg.Wait()
+	fmt.Println("All workers have finished. Proceeding with the next step.")
+}
